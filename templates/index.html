@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 Maze Solver AI</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    
+    <!-- Animate.css for animations -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-puzzle"></i> Maze Solver AI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#upload-section">Upload</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#results-section">Results</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#stats-section">Statistics</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold text-white mb-4 animate__animated animate__fadeInUp">
+                        🧠 AI-Powered Maze Solver
+                    </h1>
+                    <p class="lead text-white-50 mb-5 animate__animated animate__fadeInUp animate__delay-1s">
+                        Upload your maze and watch 6 different algorithms compete to find the optimal path!
+                    </p>
+                    <div class="animate__animated animate__fadeInUp animate__delay-2s">
+                        <a href="#upload-section" class="btn btn-primary btn-lg me-3">
+                            <i class="bi bi-upload"></i> Start Solving
+                        </a>
+                        <a href="https://www.mazegenerator.net/" target="_blank" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-grid-3x3"></i> Generate Maze
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upload Section -->
+    <section id="upload-section" class="py-5 bg-light">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-header bg-primary text-white text-center">
+                            <h3 class="mb-0"><i class="bi bi-cloud-upload"></i> Upload Your Maze</h3>
+                        </div>
+                        <div class="card-body p-5">
+                            <!-- File Upload -->
+                            <div class="upload-area" id="uploadArea">
+                                <div class="upload-content">
+                                    <i class="bi bi-cloud-upload display-1 text-primary mb-3"></i>
+                                    <h4>Drag & Drop Your Maze Image</h4>
+                                    <p class="text-muted">Or click to browse files</p>
+                                    <p class="small text-muted">Supports PNG, JPG, JPEG (Max 16MB)</p>
+                                </div>
+                                <input type="file" id="mazeFile" accept=".png,.jpg,.jpeg" class="d-none">
+                            </div>
+
+                            <!-- Generate Maze Option -->
+                            <div class="text-center mt-4">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Width</label>
+                                        <input type="number" class="form-control" id="mazeWidth" value="21" min="11" max="51" step="2">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Height</label>
+                                        <input type="number" class="form-control" id="mazeHeight" value="21" min="11" max="51" step="2">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">&nbsp;</label>
+                                        <button class="btn btn-success w-100" id="generateMaze">
+                                            <i class="bi bi-magic"></i> Generate Maze
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Process Button -->
+                            <div class="text-center mt-4">
+                                <button class="btn btn-primary btn-lg" id="processMaze" disabled>
+                                    <i class="bi bi-cpu"></i> Solve Maze
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results-section" class="py-5 d-none">
+        <div class="container">
+            <!-- Results Header -->
+            <div class="row mb-5">
+                <div class="col text-center">
+                    <h2 class="display-5 fw-bold">🎯 Algorithm Results</h2>
+                    <p class="lead text-muted">Compare how different pathfinding algorithms perform</p>
+                    
+                    <!-- Difficulty Badge -->
+                    <div class="mb-3">
+                        <span class="badge bg-info fs-6" id="difficultyBadge">
+                            <i class="bi bi-speedometer2"></i> Difficulty: <span id="difficultyLevel">Loading...</span>
+                        </span>
+                    </div>
+
+                    <!-- Download Button -->
+                    <button class="btn btn-outline-primary" id="downloadResults">
+                        <i class="bi bi-download"></i> Download All Results (ZIP)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Algorithm Cards Grid -->
+            <div class="row g-4" id="algorithmGrid">
+                <!-- Cards will be populated dynamically -->
+            </div>
+
+            <!-- Animation Section -->
+            <div class="row mt-5">
+                <div class="col text-center">
+                    <h3 class="mb-4">🎬 Pathfinding Animation</h3>
+                    <div class="card shadow border-0">
+                        <div class="card-body">
+                            <img id="animationGif" src="" alt="Pathfinding Animation" class="img-fluid rounded">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section id="stats-section" class="py-5 bg-light d-none">
+        <div class="container">
+            <div class="row">
+                <div class="col text-center mb-5">
+                    <h2 class="display-5 fw-bold">📊 Performance Statistics</h2>
+                    <p class="lead text-muted">Detailed comparison of algorithm performance</p>
+                </div>
+            </div>
+
+            <!-- Statistics Table -->
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th><i class="bi bi-cpu"></i> Algorithm</th>
+                                            <th><i class="bi bi-clock"></i> Time (ms)</th>
+                                            <th><i class="bi bi-arrow-right"></i> Path Length</th>
+                                            <th><i class="bi bi-search"></i> Nodes Explored</th>
+                                            <th><i class="bi bi-graph-up"></i> Complexity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="statsTableBody">
+                                        <!-- Table rows will be populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>🧠 Maze Solver AI</h5>
+                    <p class="small text-muted">Powered by advanced pathfinding algorithms</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="small text-muted">
+                        Built with Flask, OpenCV, and Bootstrap 5
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
